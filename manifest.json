@@ -1,0 +1,42 @@
+{
+    "manifest_version": 2,
+
+    "name"        : "TextObfuscator",
+    "version"     : "0.1",
+    "description" : "Obfuscates text",
+    "homepage_url": "https://no-url.yet/",
+
+    "icons": {
+        "16": "icons/pop.svg",
+        "32": "icons/pop.svg",
+        "48": "icons/pop.svg",
+        "96": "icons/pop.svg"
+    },
+
+    "permissions": [
+        "activeTab"
+    ],
+
+    "web_accessible_resources": [
+        "data/table.csv"
+    ],
+
+    "browser_action": {
+        "default_icon": {
+            "16": "icons/pop.svg",
+            "32": "icons/pop.svg",
+            "48": "icons/pop.svg",
+            "96": "icons/pop.svg"
+        },
+        "default_title": "TextObfuscator",
+        "default_popup": "popup/menu.html"
+    },
+
+    "content_scripts": [{
+        "matches": ["<all_urls>"],
+        "js"     : [
+            "content/obfuscate.js",
+            "content/table.js"
+        ]
+    }]
+}
