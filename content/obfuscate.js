@@ -11,35 +11,78 @@ function obfuscateTypedChar(charStr) {
     if(idx === undefined)
         return charStr;
     let p = mainList[idx];
-    do {
-        var c = p[getRandomInt(p.length)];
-    } while(c == charStr);
+    let c = p[getRandomInt(p.length)];
+    if(c == charStr) c = p[getRandomInt(p.length)];
 
     return c;
 }
 
-//
-// function insertTextAtCursor(text) {
-//     var sel, range, textNode;
-//     if (document.getSelection) {
-//         sel = document.getSelection();
-//         if (sel.getRangeAt && sel.rangeCount) {
+
+// function getSelection(element) {
+    // var start;
+    // var end;
+    // var type;
+    //
+    // var doc = element.ownerDocument || element.document;
+    // var win = doc.defaultView || doc.parentWindow;
+    // var sel;
+    //
+    // // firefox workaround
+    // if(element.selectionStart != undefined) {
+    //     start = element.selectionStart;
+    //     end = element.selectionEnd;
+    //     type = "selectionStart";
+    // }
+    // else if (typeof win.getSelection != "undefined") {
+    //     sel = win.getSelection();
+    //     if (sel.rangeCount > 0) {
+    //         var range = win.getSelection().getRangeAt(0);
+    //         var preCaretRange = range.cloneRange();
+    //         preCaretRange.selectNodeContents(element);
+    //         preCaretRange.setEnd(range.startContainer, range.startOffset);
+    //         start = preCaretRange.toString().length;
+    //         preCaretRange.setEnd(range.endContainer, range.endOffset);
+    //         end = preCaretRange.toString().length;
+    //         type = "win.getSelection";
+    //     }
+    // }
+    // else if ( (sel = doc.selection) && sel.type != "Control") {
+    //     var textRange = sel.createRange();
+    //     var preCaretTextRange = doc.body.createTextRange();
+    //     preCaretTextRange.moveToElementText(element);
+    //     preCaretTextRange.setEndPoint("EndToStart", textRange);
+    //     start = preCaretTextRange.text.length;
+    //     preCaretTextRange.setEndPoint("EndToEnd", textRange);
+    //     end = preCaretTextRange.text.length;
+    //     type = "doc.selection";
+    // }
+    // return { start: start, end: end, type: type };
+// }
+
+
+// function replaceSelectedText(replacementText) {
+//     var sel, range;
+//     if (window.getSelection) {
+//         sel = window.getSelection();
+//         if (sel.rangeCount) {
 //             range = sel.getRangeAt(0);
 //             range.deleteContents();
-//             textNode = document.createTextNode(text);
-//             range.insertNode(textNode);
-//
-//             // Move caret to the end of the newly inserted text node
-//             range.setStart(textNode, textNode.length);
-//             range.setEnd(textNode, textNode.length);
-//             sel.removeAllRanges();
-//             sel.addRange(range);
+//             range.insertNode(document.createTextNode(replacementText));
 //         }
 //     } else if (document.selection && document.selection.createRange) {
 //         range = document.selection.createRange();
-//         range.pasteHTML(text);
+//         range.text = replacementText;
 //     }
 // }
+
+
+function clearSelection() {
+    if (window.getSelection) {
+        window.getSelection().removeAllRanges();
+    } else if (document.selection) {
+        document.selection.empty();
+    }
+}
 
 
 function OnKeyPress(event) {
@@ -49,34 +92,46 @@ function OnKeyPress(event) {
     if (charCode) {
         var charStr = String.fromCharCode(charCode);
         var transformedChar = obfuscateTypedChar(charStr);
-        var start = this.selectionStart;
-        var end = this.selectionEnd;
-        var val = this.value;
-        this.value = val.slice(0, start) + transformedChar + val.slice(end);
 
-        // Move the caret
-        this.selectionStart = this.selectionEnd = start + transformedChar.length;
-        // event.stopImmediatePropagation();
+        // firefox <input>/<textarea> workaround
+        if(this.selectionStart != undefined) {
+            let start = this.selectionStart;
+            let end = this.selectionEnd;
+            let val = this.value;
+            this.value = val.slice(0, start) + transformedChar + val.slice(end);
+            this.selectionStart = this.selectionEnd = start + transformedChar.length;
+        }
+        else  {
+            let doc = this.ownerDocument || this.document;
+            let win = doc.defaultView || doc.parentWindow;
+            let sel;
+            if (typeof win.getSelection != "undefined") {
+                sel = win.getSelection();
+                if (sel.rangeCount > 0) {
+                    let range = sel.getRangeAt(0);
+                    range.deleteContents();
+                    range.insertNode(document.createTextNode(transformedChar));
+                    range.setStart(range.endContainer, range.endOffset);
+                    range.collapse(true);
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+
+                    // var range = win.getSelection().getRangeAt(0);
+                    // var preCaretRange = range.cloneRange();
+                    // preCaretRange.selectNodeContents(this);
+                    // preCaretRange.setEnd(range.startContainer, range.startOffset);
+                    // start = preCaretRange.toString().length;
+                    // preCaretRange.setEnd(range.endContainer, range.endOffset);
+                    // end = preCaretRange.toString().length;
+                }
+            }
+        }
+        // else if (document.selection && document.selection.createRange) {
+        //     range = document.selection.createRange();
+        //     range.text = transformedChar;
+        // }
         return false;
-
-        // var charStr = String.fromCharCode(charCode);
-        // var greek = obfuscateTypedChar(charStr);
-        // insertTextAtCursor(greek);
-        // return false;
     }
-
-    // if (event.which) {
-    //     var charStr = String.fromCharCode(event.which);
-    //     var transformedChar = obfuscateTypedChar(charStr);
-    //     if (transformedChar != charStr) {
-    //         var start = this.selectionStart, end = this.selectionEnd, val = this.value;
-    //         this.value = val.slice(0, start) + transformedChar + val.slice(end);
-    //
-    //         // Move the caret
-    //         this.selectionStart = this.selectionEnd = start + 1;
-    //         return false;
-    //     }
-    // }
 }
 
 
@@ -84,7 +139,6 @@ function OnFocusIn(event) {
     let $focused = event.target;
     if($focused === undefined)
         return;
-    //$(":focus").on("keypress", OnKeyPress);
     $focused.addEventListener("keypress", OnKeyPress, true);
     $focused.style.background = 'pink';
 }
