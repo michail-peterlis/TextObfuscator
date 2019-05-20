@@ -1,18 +1,12 @@
-html, body {
-  width: 100px;
+body {
+  width: 20px;
+  height: 110px;
 }
 
-.button {
-  margin: 3% auto;
-  padding: 4px;
-  text-align: center;
-  cursor: pointer;
-}
 
-.button:hover {
-  background-color: #CFF2F2;
-}
-
-.button {
-  background-color: #F5F2F2;
+.levelslider
+{
+    -webkit-appearance: slider-vertical; /* WebKit */
+    width: 10px;
+    height: 100px;
 }
