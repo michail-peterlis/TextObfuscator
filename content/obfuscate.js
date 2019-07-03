@@ -10,7 +10,10 @@ function obfuscateTypedChar(charStr) {
     let idx = searchList.get(charStr);
     if(idx === undefined)
         return charStr;
-    let p = mainList[idx];
+    let p = new Array();
+    idx.forEach(function(i) {
+        p.push(mainList[i]);
+    });
     let c = p[getRandomInt(p.length)];
     if(c == charStr) c = p[getRandomInt(p.length)];
 
@@ -23,14 +26,27 @@ function OnKeyPress(event) {
     event.preventDefault();
     var charCode = (typeof event.which == "undefined") ? event.keyCode : event.which;
     if (charCode) {
-        var charStr = String.fromCharCode(charCode);
-        var transformedChar = obfuscateTypedChar(charStr);
+        let charStr = String.fromCharCode(charCode);
+        let transformedChar = obfuscateTypedChar(charStr);
 
         // firefox <input>/<textarea> workaround
         if(this.selectionStart != undefined) {
             let start = this.selectionStart;
             let end = this.selectionEnd;
             let val = this.value;
+
+            let idx = searchList.get(charStr);
+            if(idx != undefined) {
+                if(idx.length == 1) {
+                    let p = mainList[idx[0]];
+                    transformedChar = p[getRandomInt(p.length)];
+                    if(transformedChar == charStr) transformedChar = p[getRandomInt(p.length)];
+                }
+                else {
+                    // what now????
+                }
+            }
+
             this.value = val.slice(0, start) + transformedChar + val.slice(end);
             this.selectionStart = this.selectionEnd = start + transformedChar.length;
         }
@@ -38,7 +54,7 @@ function OnKeyPress(event) {
             let doc = this.ownerDocument || this.document;
             let win = doc.defaultView || doc.parentWindow;
             let sel;
-            if (typeof win.getSelection != "undefined") {
+            if (win.getSelection != undefined) {
                 sel = win.getSelection();
                 if (sel.rangeCount > 0) {
                     let range = sel.getRangeAt(0);
@@ -61,20 +77,20 @@ function OnKeyPress(event) {
 
 
 function OnFocusIn(event) {
-    let $focused = event.target;
-    if($focused === undefined)
+    let focused = event.target;
+    if(focused === undefined)
         return;
-    $focused.addEventListener("keypress", OnKeyPress, true);
-    $focused.style.background = 'pink';
+    focused.addEventListener("keypress", OnKeyPress, true);
+    focused.style.background = '#ffb3d9';
 }
 
 
 function OnFocusOut(event) {
-    let $focused = event.target;
-    if($focused === undefined)
+    let focused = event.target;
+    if(focused === undefined)
         return;
-    $focused.removeEventListener("keypress", OnKeyPress, true);
-    $focused.style.background = '';
+    focused.removeEventListener("keypress", OnKeyPress, true);
+    focused.style.background = '';
 }
 
 
@@ -92,9 +108,22 @@ chrome.runtime.onMessage.addListener(
                 document.addEventListener("focusin", OnFocusIn, true);
                 document.addEventListener("focusout", OnFocusOut, true);
 
-                mainList.forEach(function(l, i) {
-                    l.forEach(function(e) {
-                        searchList.set(e, i);
+                var append = (k, v) => {
+                    let mv = searchList.get(k);
+                    if(mv === undefined) {
+                        mv = new Array();
+                        searchList.set(k, mv);
+                    }
+                    mv.push(v);
+                };
+
+                mainList.forEach((v, i) => {
+                    v.forEach((e) => {
+                        append(e, i);
+                        if(e.length > 1) {
+                            let mb = e.split('');
+                            mb.forEach((l) => { append(l, i); });
+                        }
                     });
                 });
             break;
