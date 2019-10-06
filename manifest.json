@@ -2,7 +2,7 @@
     "manifest_version": 2,
 
     "name"        : "TextObfuscator",
-    "version"     : "0.1.1",
+    "version"     : "0.201",
     "description" : "Obfuscates text",
     "homepage_url": "https://addons.mozilla.org/addon/textobfuscator/",
 
