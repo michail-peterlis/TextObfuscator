@@ -6,11 +6,10 @@
     "description" : "Obfuscates text",
     "homepage_url": "https://addons.mozilla.org/addon/textobfuscator/",
 
-    "icons": {
-        "16": "icons/pop.svg",
-        "32": "icons/pop.svg",
-        "48": "icons/pop.svg",
-        "96": "icons/pop.svg"
+    "applications": {
+        "gecko": {
+            "id": "michail.peterlis@gmail.com"
+        }
     },
 
     "permissions": [
@@ -18,6 +17,13 @@
         "storage",
         "downloads"
     ],
+
+    "icons": {
+        "16": "icons/pop.svg",
+        "32": "icons/pop.svg",
+        "48": "icons/pop.svg",
+        "96": "icons/pop.svg"
+    },
 
     "browser_action": {
         "default_icon": {
@@ -38,12 +44,6 @@
             "content/common.js"
         ]
     }],
-   
-    "applications": {
-        "gecko": {
-            "id": "addon@example.com"
-        }
-    },
     
     "options_ui": {
         "page": "settings/settings.html"

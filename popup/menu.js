@@ -46,7 +46,7 @@ function init() {
         let l;   
         if(value == 0) l = "DISABLED";
         else l = levels[value-1];
-        document.getElementById("leveltext").innerHTML = l;
+        document.getElementById("leveltext").textContent = l;
     };
 }
 

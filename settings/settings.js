@@ -138,7 +138,7 @@ function createSettingsTable(table) {
                 td.ondblclick = delConfusable;
 
                 let d = document.createElement("div");
-                d.innerHTML = c;
+                d.textContent = c;
                 d.title = string_as_unicode_escape(c);
                 
                 td.appendChild(d);
@@ -150,7 +150,7 @@ function createSettingsTable(table) {
     tr.onclick = markSettingRow;
     let td = tr.insertCell();
     let d = document.createElement("div");
-    d.innerHTML = PLACEHOLDER;
+    d.textContent = PLACEHOLDER;
     td.appendChild(d);
     
     target.appendChild(tbl);
@@ -204,13 +204,13 @@ function addConfusable(elmt) {
                 tr.onclick = markSettingRow;
                 let td = tr.insertCell();
                 let d = document.createElement("div");
-                d.innerHTML = PLACEHOLDER;
+                d.textContent = PLACEHOLDER;
                 td.appendChild(d);
             }
         let td = currentRow.insertCell();
         td.ondblclick = delConfusable;
         let d = document.createElement("div");
-        d.innerHTML = this.value;
+        d.textContent = this.value;
         d.title = string_as_unicode_escape(this.value);
         td.appendChild(d);
     }
@@ -229,7 +229,7 @@ function delConfusable(elmt) {
     if(tr.childNodes.length == undefined || tr.childNodes.length == 0) {
         td = tr.insertCell();
         let d = document.createElement("div");
-        d.innerHTML = PLACEHOLDER;
+        d.textContent = PLACEHOLDER;
         td.appendChild(d);
     }
 }
