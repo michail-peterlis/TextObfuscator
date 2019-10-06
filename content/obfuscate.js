@@ -1,5 +1,6 @@
 var searchList = new Map();
-
+var table;
+let lastInput;
 
 function getRandomInt(max) {
     return Math.floor(Math.random() * Math.floor(max));
@@ -8,15 +9,27 @@ function getRandomInt(max) {
 
 function obfuscateTypedChar(charStr) {
     let idx = searchList.get(charStr);
+    let c;
     if(idx === undefined)
         return charStr;
     let p = new Array();
-    idx.forEach(function(i) {
-        p.push(mainList[i]);
-    });
-    let c = p[getRandomInt(p.length)];
-    if(c == charStr) c = p[getRandomInt(p.length)];
-
+    if(idx.length == 1) {
+        table[idx[0]].forEach(function(i) { p.push(i); });
+        c = p[getRandomInt(p.length)];
+        if(c == charStr) c = p[getRandomInt(p.length)];
+    }
+    else {
+        idx.forEach((i) => {
+            if(table[i].find((e) => { return e == charStr; })) {
+                p = table[i];
+                c = p[getRandomInt(p.length)];
+                if(c == charStr) c = p[getRandomInt(p.length)];
+                // lastInput += charStr;
+            }
+        });
+    }
+    if(c === undefined)
+        c = charStr;
     return c;
 }
 
@@ -38,7 +51,7 @@ function OnKeyPress(event) {
             let idx = searchList.get(charStr);
             if(idx != undefined) {
                 if(idx.length == 1) {
-                    let p = mainList[idx[0]];
+                    let p = table[idx[0]];
                     transformedChar = p[getRandomInt(p.length)];
                     if(transformedChar == charStr) transformedChar = p[getRandomInt(p.length)];
                 }
@@ -94,39 +107,44 @@ function OnFocusOut(event) {
 }
 
 
-chrome.runtime.onMessage.addListener(
-    function(message, sender, sendResponse) {
-        // sendResponse($focused.tagName);
+async function switchLevel(message, sender, sendResponse) {
+    // sendResponse($focused.tagName);
 
-        switch(message.type) {
-            case "LEVEL_0":
-                document.removeEventListener("focusin", OnFocusIn, true);
-                document.removeEventListener("focusout", OnFocusOut, true);
-            break;
-
-            case "LEVEL_1":
-                document.addEventListener("focusin", OnFocusIn, true);
-                document.addEventListener("focusout", OnFocusOut, true);
-
-                var append = (k, v) => {
-                    let mv = searchList.get(k);
-                    if(mv === undefined) {
-                        mv = new Array();
-                        searchList.set(k, mv);
-                    }
-                    mv.push(v);
-                };
-
-                mainList.forEach((v, i) => {
-                    v.forEach((e) => {
-                        append(e, i);
-                        if(e.length > 1) {
-                            let mb = e.split('');
-                            mb.forEach((l) => { append(l, i); });
-                        }
-                    });
-                });
-            break;
-        }
+    if(message.type == "DISABLED") {
+        document.removeEventListener("focusin", OnFocusIn, true);
+        document.removeEventListener("focusout", OnFocusOut, true);
     }
-);
+    else {        
+        await browser.storage.sync.get(message.type).then((l) => {
+            table = l[message.type];
+                    
+            searchList.clear();
+
+            var append = (k, v) => {
+                let mv = searchList.get(k);
+                if(mv === undefined) {
+                    mv = new Array();
+                    searchList.set(k, mv);
+                }
+                mv.push(v);
+            };
+
+            table.forEach((v, k) => {
+                v.forEach((e) => {
+                    append(e, k);
+                    if(e.length > 1) {
+                        let mb = e.split('');
+                        mb.forEach((l) => { append(l, k); });
+                    }
+                });
+            });
+            
+            document.addEventListener("focusin", OnFocusIn, true);
+            document.addEventListener("focusout", OnFocusOut, true);
+        });
+    }
+}
+
+
+
+chrome.runtime.onMessage.addListener(switchLevel);

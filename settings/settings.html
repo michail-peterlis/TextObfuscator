@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="settings.css">
+</head>
+
+<body>
+    <form id="form">
+        <label>LEVEL</label>
+        <select id="levelSelect"></select>
+        <input type="button" id="newLevel" value="New level"></input>
+        <input type="button" id="deleteLevel" value="Delete level"></input>
+        <input type="button" id="save" value="Save level"></input>
+        <input id="nameLevel" type="text" placeholder="renaming field"></input>
+        <hr/>
+        
+        <div id="columns">
+            <div id="settings_column"   class="column"></div>
+            <div id="suggestion_column" class="column"></div>
+        </div>
+        
+        <input type="button" id="reset" value="Reset to default"></input>
+        <input type="button" id="export" value="Export current level"></input>
+        <input type="button" id="import" value="Import new level"></input>
+        <input type='file' id="choseFile" style="display:none">
+    </form>
+
+    <script src="../content/common.js"></script>
+    <script src="defaults.js"></script>
+    <script src="settings.js"></script>
+</body>
+</html>

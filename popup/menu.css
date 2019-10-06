@@ -1,12 +1,13 @@
 body {
-  width: 20px;
-  height: 110px;
+  width: 160px;
+  height: 40px;
 }
 
 
-.levelslider
+#levelslider
 {
-    -webkit-appearance: slider-vertical; /* WebKit */
-    width: 10px;
-    height: 100px;
+    width: 100%;
+    height: 10px;
+    align: right;
+    float: right;
 }

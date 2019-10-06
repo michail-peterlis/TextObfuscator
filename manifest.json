@@ -14,7 +14,9 @@
     },
 
     "permissions": [
-        "activeTab"
+        "activeTab",
+        "storage",
+        "downloads"
     ],
 
     "browser_action": {
@@ -32,7 +34,18 @@
         "matches": ["<all_urls>"],
         "js"     : [
             "content/obfuscate.js",
-            "content/table.js"
+            "content/table.js",
+            "content/common.js"
         ]
-    }]
+    }],
+   
+    "applications": {
+        "gecko": {
+            "id": "addon@example.com"
+        }
+    },
+    
+    "options_ui": {
+        "page": "settings/settings.html"
+    }
 }
